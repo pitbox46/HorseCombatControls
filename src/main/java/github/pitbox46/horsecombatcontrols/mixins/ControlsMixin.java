@@ -40,7 +40,6 @@ public abstract class ControlsMixin extends LivingEntity{
 
     @Inject(at=@At(value = "INVOKE", target = "net/minecraft/entity/passive/horse/AbstractHorseEntity.getControllingPassenger()Lnet/minecraft/entity/Entity;", ordinal=0), method="travel(Lnet/minecraft/util/math/vector/Vector3d;)V", cancellable = true)
     private void travelInject(Vector3d travelVector, CallbackInfo ci) {
-        //PacketHandler.CHANNEL.sendToServer(new EmptyPacket(EmptyPacket.Types.REQUEST_MODE));
         if(getControllingPassenger() instanceof PlayerEntity && HorseCombatControls.inCombatMode()) {
             LivingEntity livingentity = (LivingEntity)this.getControllingPassenger();
             float strafingMovement = livingentity.moveStrafing * 0.5F;
