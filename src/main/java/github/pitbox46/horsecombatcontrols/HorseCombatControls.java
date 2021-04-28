@@ -1,9 +1,6 @@
 package github.pitbox46.horsecombatcontrols;
 
-import github.pitbox46.horsecombatcontrols.network.ClientProxy;
-import github.pitbox46.horsecombatcontrols.network.CommonProxy;
-import github.pitbox46.horsecombatcontrols.network.PacketHandler;
-import github.pitbox46.horsecombatcontrols.network.ToggleControls;
+import github.pitbox46.horsecombatcontrols.network.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraftforge.api.distmarker.Dist;
@@ -24,6 +21,7 @@ import org.apache.logging.log4j.Logger;
 public class HorseCombatControls {
     private static final Logger LOGGER = LogManager.getLogger();
 
+    public static boolean combatMode;
     public static CommonProxy PROXY;
     private static final KeyBinding toggleControls = new KeyBinding("key.horsecombatcontrols.toggle", 89, "key.horsecombatcontrols.category");
 
@@ -41,7 +39,15 @@ public class HorseCombatControls {
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event) {
         if(toggleControls.isPressed() && Minecraft.getInstance().player != null) {
-            PacketHandler.CHANNEL.sendToServer(new ToggleControls());
+            PacketHandler.CHANNEL.sendToServer(new EmptyPacket(EmptyPacket.Types.TOGGLE_MODE));
         }
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public static boolean inCombatMode() {
+        if(Minecraft.getInstance().player != null) {
+            PacketHandler.CHANNEL.sendToServer(new EmptyPacket(EmptyPacket.Types.REQUEST_MODE));
+        }
+        return combatMode;
     }
 }

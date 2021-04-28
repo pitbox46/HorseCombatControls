@@ -2,7 +2,7 @@
   "required": true,
   "package": "github.pitbox46.horsecombatcontrols.mixins",
   "compatibilityLevel": "JAVA_8",
-  "refmap": "horsecontrols.refmap.json",
+  "refmap": "horsecombatcontrols.refmap.json",
   "mixins": [
     "ControlsMixin"
   ],

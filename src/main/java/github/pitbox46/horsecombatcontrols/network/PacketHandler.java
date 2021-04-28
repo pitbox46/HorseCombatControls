@@ -17,12 +17,34 @@ public class PacketHandler {
     public static void init() {
         CHANNEL.registerMessage(
                 ID++,
-                ToggleControls.class,
+                EmptyPacket.class,
                 (msg, pb) -> {
+                    pb.writeEnumValue(msg.type);
                 },
-                pb -> new ToggleControls(),
+                pb -> new EmptyPacket(pb.readEnumValue(EmptyPacket.Types.class)),
                 (msg, ctx) -> {
-                    ctx.get().enqueueWork(() -> HorseCombatControls.PROXY.handleToggleControls(ctx.get()));
+                    switch(msg.type) {
+                        case REQUEST_MODE:
+                            ctx.get().enqueueWork(() -> HorseCombatControls.PROXY.handleControlModeQuery(ctx.get()));
+                            ctx.get().setPacketHandled(true);
+                            break;
+                        case TOGGLE_MODE:
+                            ctx.get().enqueueWork(() -> HorseCombatControls.PROXY.handleToggleControls(ctx.get()));
+                            ctx.get().setPacketHandled(true);
+                            break;
+                        default:
+                            ctx.get().setPacketHandled(false);
+                    }
+                });
+        CHANNEL.registerMessage(
+                ID++,
+                ModeReturn.class,
+                (msg, pb) -> {
+                    pb.writeBoolean(msg.combatMode);
+                },
+                pb -> new ModeReturn(pb.getBoolean(0)),
+                (msg, ctx) -> {
+                    ctx.get().enqueueWork(() -> HorseCombatControls.PROXY.handleControlModeReturn(ctx.get(), msg));
                     ctx.get().setPacketHandled(true);
                 });
     }

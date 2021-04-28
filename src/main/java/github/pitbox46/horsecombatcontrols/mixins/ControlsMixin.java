@@ -1,6 +1,6 @@
 package github.pitbox46.horsecombatcontrols.mixins;
 
-import github.pitbox46.horsecombatcontrols.network.CommonProxy;
+import github.pitbox46.horsecombatcontrols.HorseCombatControls;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -27,7 +27,6 @@ public abstract class ControlsMixin extends LivingEntity{
         super(type, worldIn);
     }
 
-    @Shadow protected int gallopTime;
     @Shadow protected float jumpPower;
     @Shadow private boolean allowStandSliding;
 
@@ -41,9 +40,8 @@ public abstract class ControlsMixin extends LivingEntity{
 
     @Inject(at=@At(value = "INVOKE", target = "net/minecraft/entity/passive/horse/AbstractHorseEntity.getControllingPassenger()Lnet/minecraft/entity/Entity;", ordinal=0), method="travel(Lnet/minecraft/util/math/vector/Vector3d;)V", cancellable = true)
     private void travelInject(Vector3d travelVector, CallbackInfo ci) {
-        if(getControllingPassenger() instanceof PlayerEntity &&
-                CommonProxy.PLAYER_TOGGLE_MAP.containsKey(getControllingPassenger().getUniqueID()) &&
-                CommonProxy.PLAYER_TOGGLE_MAP.get(getControllingPassenger().getUniqueID())) {
+        //PacketHandler.CHANNEL.sendToServer(new EmptyPacket(EmptyPacket.Types.REQUEST_MODE));
+        if(getControllingPassenger() instanceof PlayerEntity && HorseCombatControls.inCombatMode()) {
             LivingEntity livingentity = (LivingEntity)this.getControllingPassenger();
             float strafingMovement = livingentity.moveStrafing * 0.5F;
             float forwardMovement = livingentity.moveForward;
@@ -118,9 +116,7 @@ public abstract class ControlsMixin extends LivingEntity{
 
     @Inject(at=@At(value="INVOKE",target="net/minecraft/entity/passive/horse/AbstractHorseEntity.makeHorseRear()V", ordinal=0), method="getAmbientSound()Lnet/minecraft/util/SoundEvent;", cancellable=true)
     private void cancelRandomRearing(CallbackInfoReturnable<SoundEvent> cir) {
-        if(getControllingPassenger() instanceof PlayerEntity &&
-                CommonProxy.PLAYER_TOGGLE_MAP.containsKey(getControllingPassenger().getUniqueID()) &&
-                CommonProxy.PLAYER_TOGGLE_MAP.get(getControllingPassenger().getUniqueID()))
+        if(getControllingPassenger() instanceof PlayerEntity && HorseCombatControls.inCombatMode())
             cir.cancel();
     }
 }
