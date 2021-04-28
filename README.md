@@ -1,4 +1,4 @@
-#Horse Combat Controls
+# Horse Combat Controls
 
 Mount and Blade style controls for Minecraft's horses
 
