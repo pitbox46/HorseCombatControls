@@ -4,7 +4,8 @@
   "compatibilityLevel": "JAVA_8",
   "refmap": "horsecombatcontrols.refmap.json",
   "mixins": [
-    "ControlsMixin"
+    "ControlsMixin",
+    "PlayerMixin"
   ],
   "minVersion": "0.8"
 }
