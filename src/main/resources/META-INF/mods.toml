@@ -21,7 +21,7 @@ modId = "horsecombatcontrols" #mandatory
 # see the associated build.gradle script for how to populate this completely automatically during a build
 version = "${file.jarVersion}" #mandatory
 # A display name for the mod
-displayName = "Horse Combat Controls" #mandatory
+displayName = "Horse Combat Controls-Client" #mandatory
 # A URL to query for updates for this mod. See the JSON update specification <here>
 #updateJSONURL="http://myurl.me/" #optional
 # A URL for the "homepage" for this mod, displayed in the mod UI
@@ -34,7 +34,8 @@ displayURL="https://www.curseforge.com/minecraft/mc-mods/horse-combat-controls" 
 authors = "pitbox46" #optional
 # The description text for the mod (multi line!) (#mandatory)
 description = '''
-Adds Mount and Blade style combat controls for horses
+Adds Mount and Blade style combat controls for horses.
+This is the client side only version of the mod. It is not recommended to utilize this mod in public combat servers such as Hypixel.
 '''
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
 [[dependencies.horsecombatcontrols]] #optional
@@ -47,7 +48,7 @@ versionRange = "[36,)" #mandatory
 # An ordering relationship for the dependency - BEFORE or AFTER required if the relationship is not mandatory
 ordering = "NONE"
 # Side this dependency is applied on - BOTH, CLIENT or SERVER
-side = "BOTH"
+side = "CLIENT"
 # Here's another dependency
 [[dependencies.horsecombatcontrols]]
 modId = "minecraft"

@@ -3,9 +3,8 @@
   "package": "github.pitbox46.horsecombatcontrols.mixins",
   "compatibilityLevel": "JAVA_8",
   "refmap": "horsecombatcontrols.refmap.json",
-  "mixins": [
-    "ControlsMixin",
-    "PlayerMixin"
+  "client": [
+    "ControlsMixin"
   ],
   "minVersion": "0.8"
 }

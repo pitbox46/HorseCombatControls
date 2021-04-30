@@ -1,6 +1,6 @@
 package github.pitbox46.horsecombatcontrols.mixins;
 
-import github.pitbox46.horsecombatcontrols.CombatModeAccessor;
+import github.pitbox46.horsecombatcontrols.HorseCombatControls;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.LivingEntity;
@@ -22,7 +22,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 import javax.annotation.Nullable;
 
 @Mixin(AbstractHorseEntity.class)
-public abstract class ControlsMixin extends LivingEntity implements CombatModeAccessor {
+public abstract class ControlsMixin extends LivingEntity {
     protected ControlsMixin(EntityType<? extends LivingEntity> type, World worldIn) {
         super(type, worldIn);
     }
@@ -44,7 +44,7 @@ public abstract class ControlsMixin extends LivingEntity implements CombatModeAc
 
     @Inject(at=@At(value = "INVOKE", target = "net/minecraft/entity/passive/horse/AbstractHorseEntity.getControllingPassenger()Lnet/minecraft/entity/Entity;", ordinal=0), method="travel(Lnet/minecraft/util/math/vector/Vector3d;)V", cancellable = true)
     private void travelInject(Vector3d travelVector, CallbackInfo ci) {
-        if(((CombatModeAccessor) getControllingPassenger()).inCombatMode()) {
+        if(HorseCombatControls.inCombatMode()) {
             LivingEntity livingentity = (LivingEntity)this.getControllingPassenger();
             float strafingMovement = livingentity.moveStrafing * 0.5F;
             float forwardMovement = livingentity.moveForward;
@@ -120,7 +120,7 @@ public abstract class ControlsMixin extends LivingEntity implements CombatModeAc
 
     @Inject(at=@At(value="INVOKE",target="net/minecraft/entity/passive/horse/AbstractHorseEntity.makeHorseRear()V", ordinal=0), method="getAmbientSound()Lnet/minecraft/util/SoundEvent;", cancellable=true)
     private void cancelRandomRearing(CallbackInfoReturnable<SoundEvent> cir) {
-        if(getControllingPassenger() instanceof PlayerEntity && ((CombatModeAccessor) getControllingPassenger()).inCombatMode())
+        if(getControllingPassenger() instanceof PlayerEntity && (HorseCombatControls.inCombatMode()))
             cir.cancel();
     }
 }
