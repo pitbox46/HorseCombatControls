@@ -8,7 +8,7 @@ import net.minecraftforge.fml.network.simple.SimpleChannel;
 public class PacketHandler {
     private static final String PROTOCOL_VERSION = "3.2.1";
     public static SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
-            new ResourceLocation("reroll","main"),
+            new ResourceLocation("horsecombatcontrols","main"),
             () -> PROTOCOL_VERSION,
             PROTOCOL_VERSION::equals,
             PROTOCOL_VERSION::equals);
@@ -22,6 +22,15 @@ public class PacketHandler {
                 pb -> new EmptyPacket(pb.readEnumValue(EmptyPacket.Type.class)),
                 (msg, ctx) -> {
                     ctx.get().enqueueWork(() -> HorseCombatControls.PROXY.handleToggleMode(ctx.get()));
+                    ctx.get().setPacketHandled(true);
+                });
+        CHANNEL.registerMessage(
+                ID++,
+                UUIDPacket.class,
+                (msg, pb) -> pb.writeUniqueId(msg.uuid),
+                pb -> new UUIDPacket(pb.readUniqueId()),
+                (msg, ctx) -> {
+                    ctx.get().enqueueWork(() -> HorseCombatControls.PROXY.handleToggleMode(ctx.get(), msg.uuid));
                     ctx.get().setPacketHandled(true);
                 });
     }

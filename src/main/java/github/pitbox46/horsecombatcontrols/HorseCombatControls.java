@@ -21,7 +21,7 @@ import org.apache.logging.log4j.Logger;
 
 @Mod("horsecombatcontrols")
 public class HorseCombatControls {
-    private static final Logger LOGGER = LogManager.getLogger();
+    public static final Logger LOGGER = LogManager.getLogger();
 
     @OnlyIn(Dist.CLIENT)
     private static KeyBinding toggleControls;
