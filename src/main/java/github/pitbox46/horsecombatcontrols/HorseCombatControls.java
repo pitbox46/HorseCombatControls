@@ -23,7 +23,6 @@ import org.apache.logging.log4j.Logger;
 public class HorseCombatControls {
     public static final Logger LOGGER = LogManager.getLogger();
 
-    @OnlyIn(Dist.CLIENT)
     private static KeyBinding toggleControls;
     public static CommonProxy PROXY;
 
