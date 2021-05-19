@@ -14,7 +14,13 @@ public class PlayerMixin implements CombatModeAccessor {
     }
 
     @Override
-    public void toggleCombatMode() {
+    public boolean toggleCombatMode() {
         horseCombatMode = !horseCombatMode;
+        return horseCombatMode;
+    }
+
+    @Override
+    public void setCombatMode(boolean bool) {
+        horseCombatMode = bool;
     }
 }

@@ -21,16 +21,28 @@ public class PacketHandler {
                 (msg, pb) -> pb.writeEnumValue(msg.type),
                 pb -> new EmptyPacket(pb.readEnumValue(EmptyPacket.Type.class)),
                 (msg, ctx) -> {
-                    ctx.get().enqueueWork(() -> HorseCombatControls.PROXY.handleToggleMode(ctx.get()));
+                    switch(msg.type) {
+                        case TOGGLE_MODE:
+                            ctx.get().enqueueWork(() -> HorseCombatControls.PROXY.handleToggleMode(ctx.get()));
+                            break;
+                        case SYNC_MODE:
+                            ctx.get().enqueueWork(() -> HorseCombatControls.PROXY.handleSyncMode(ctx.get()));
+                            break;
+                        default:
+                            throw new Error("You forgot to create a new case for the new enum!");
+                    }
                     ctx.get().setPacketHandled(true);
                 });
         CHANNEL.registerMessage(
                 ID++,
                 UUIDPacket.class,
-                (msg, pb) -> pb.writeUniqueId(msg.uuid),
-                pb -> new UUIDPacket(pb.readUniqueId()),
+                (msg, pb) -> {
+                    pb.writeUniqueId(msg.uuid);
+                    pb.writeBoolean(msg.bool);
+                },
+                pb -> new UUIDPacket(pb.readUniqueId(), pb.readBoolean()),
                 (msg, ctx) -> {
-                    ctx.get().enqueueWork(() -> HorseCombatControls.PROXY.handleToggleMode(ctx.get(), msg.uuid));
+                    ctx.get().enqueueWork(() -> HorseCombatControls.PROXY.handleToggleMode(ctx.get(), msg.uuid, msg.bool));
                     ctx.get().setPacketHandled(true);
                 });
     }

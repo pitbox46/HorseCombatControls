@@ -1,6 +1,7 @@
 package github.pitbox46.horsecombatcontrols;
 
 public interface CombatModeAccessor {
-    public boolean inCombatMode();
-    public void toggleCombatMode();
+    boolean inCombatMode();
+    boolean toggleCombatMode();
+    void setCombatMode(boolean bool);
 }

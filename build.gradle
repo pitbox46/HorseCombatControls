@@ -19,7 +19,7 @@ mixin {
 }
 
 group = 'github.pitbox46'
-version = '1.16.5-1.0.2'
+version = '1.16.5-1.0.3'
 archivesBaseName = 'horsecombatcontrols'
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8'
