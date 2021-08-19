@@ -1,3 +1,7 @@
+August 19, 2021 pitbox46
+-Updated Forge version to 36.2.2
+-Should resolve Issue #2
+
 May 18, 2021 pitbox46
 -Added server config ability to lock players into combat mode
 

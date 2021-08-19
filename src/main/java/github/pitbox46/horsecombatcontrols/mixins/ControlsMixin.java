@@ -36,15 +36,11 @@ public abstract class ControlsMixin extends LivingEntity implements CombatModeAc
     @Shadow public abstract double getHorseJumpStrength();
     @Shadow public abstract void setHorseJumping(boolean jumping);
 
-    @Shadow public abstract boolean canBeSteered();
-
-    @Shadow public abstract boolean isHorseSaddled();
-
     private double previousZMotion = 0F;
 
     @Inject(at=@At(value = "INVOKE", target = "net/minecraft/entity/passive/horse/AbstractHorseEntity.getControllingPassenger()Lnet/minecraft/entity/Entity;", ordinal=0), method="travel(Lnet/minecraft/util/math/vector/Vector3d;)V", cancellable = true)
     private void travelInject(Vector3d travelVector, CallbackInfo ci) {
-        if(((CombatModeAccessor) getControllingPassenger()).inCombatMode()) {
+        if(getControllingPassenger() instanceof CombatModeAccessor && ((CombatModeAccessor) getControllingPassenger()).inCombatMode()) {
             LivingEntity livingentity = (LivingEntity)this.getControllingPassenger();
             float strafingMovement = livingentity.moveStrafing * 0.5F;
             float forwardMovement = livingentity.moveForward;
