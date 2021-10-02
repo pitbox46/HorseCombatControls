@@ -2,9 +2,9 @@ package github.pitbox46.horsecombatcontrols.network;
 
 import github.pitbox46.horsecombatcontrols.CombatModeAccessor;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 import java.util.UUID;
 
@@ -16,7 +16,7 @@ public class ClientProxy extends CommonProxy {
 
     @Override
     public void handleToggleMode(NetworkEvent.Context ctx, UUID uuid, boolean bool) {
-        if(Minecraft.getInstance().world != null && Minecraft.getInstance().world.getPlayerByUuid(uuid) instanceof AbstractClientPlayerEntity)
-            ((CombatModeAccessor) Minecraft.getInstance().world.getPlayerByUuid(uuid)).setCombatMode(bool);
+        if(Minecraft.getInstance().level != null && Minecraft.getInstance().level.getPlayerByUUID(uuid) instanceof AbstractClientPlayer)
+            ((CombatModeAccessor) Minecraft.getInstance().level.getPlayerByUUID(uuid)).setCombatMode(bool);
     }
 }

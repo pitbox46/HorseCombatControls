@@ -1,17 +1,18 @@
 package github.pitbox46.horsecombatcontrols.mixins;
 
+import com.mojang.math.Vector3d;
 import github.pitbox46.horsecombatcontrols.CombatModeAccessor;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.ai.attributes.Attributes;
-import net.minecraft.entity.passive.horse.AbstractHorseEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.potion.Effects;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Vector3d;
-import net.minecraft.world.World;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.Mth;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.animal.horse.AbstractHorse;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,32 +22,38 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import javax.annotation.Nullable;
 
-@Mixin(AbstractHorseEntity.class)
+@Mixin(AbstractHorse.class)
 public abstract class ControlsMixin extends LivingEntity implements CombatModeAccessor {
-    protected ControlsMixin(EntityType<? extends LivingEntity> type, World worldIn) {
+    protected ControlsMixin(EntityType<? extends LivingEntity> type, Level worldIn) {
         super(type, worldIn);
     }
 
-    @Shadow protected float jumpPower;
     @Shadow private boolean allowStandSliding;
 
     @Shadow @Nullable public abstract Entity getControllingPassenger();
-    @Shadow public abstract boolean isRearing();
-    @Shadow public abstract boolean isHorseJumping();
-    @Shadow public abstract double getHorseJumpStrength();
-    @Shadow public abstract void setHorseJumping(boolean jumping);
+
+    @Shadow protected float playerJumpPendingScale;
+
+    @Shadow public abstract boolean isStanding();
+
+    @Shadow public abstract double getCustomJump();
+
+    @Shadow public abstract boolean isJumping();
+
+    @Shadow public abstract void setIsJumping(boolean pJumping);
 
     private double previousZMotion = 0F;
 
-    @Inject(at=@At(value = "INVOKE", target = "net/minecraft/entity/passive/horse/AbstractHorseEntity.getControllingPassenger()Lnet/minecraft/entity/Entity;", ordinal=0), method="travel(Lnet/minecraft/util/math/vector/Vector3d;)V", cancellable = true)
-    private void travelInject(Vector3d travelVector, CallbackInfo ci) {
+    @Inject(at=@At(value = "INVOKE", target = "Lnet/minecraft/world/entity/animal/horse/AbstractHorse;getControllingPassenger()Lnet/minecraft/world/entity/Entity;", ordinal=0), method="travel", cancellable = true)
+    private void travelInject(Vec3 pTravelVector, CallbackInfo ci) {
         if(getControllingPassenger() instanceof CombatModeAccessor && ((CombatModeAccessor) getControllingPassenger()).inCombatMode()) {
             LivingEntity livingentity = (LivingEntity)this.getControllingPassenger();
-            float strafingMovement = livingentity.moveStrafing * 0.5F;
-            float forwardMovement = livingentity.moveForward;
+            float strafingMovement = livingentity.xxa * 0.5F;
+            float forwardMovement = livingentity.zza;
 
-            if(     (forwardMovement >= 0 && previousZMotion + forwardMovement * 0.01F < this.getAttributeValue(Attributes.MOVEMENT_SPEED)) ||
-                    (forwardMovement <= 0 && previousZMotion + forwardMovement * 0.01F > -this.getAttributeValue(Attributes.MOVEMENT_SPEED) * 0.25))
+            boolean flag1 = (forwardMovement >= 0 && previousZMotion + forwardMovement * 0.01F < this.getAttributeValue(Attributes.MOVEMENT_SPEED));
+            boolean flag2 = (forwardMovement <= 0 && previousZMotion + forwardMovement * 0.01F > -this.getAttributeValue(Attributes.MOVEMENT_SPEED) * 0.25);
+            if(flag1 || flag2)
                 previousZMotion += forwardMovement * 0.01F;
             forwardMovement = previousZMotion > 0 ? 1 : -1;
             float movementSpeed = (float) Math.abs(previousZMotion);
@@ -56,67 +63,67 @@ public abstract class ControlsMixin extends LivingEntity implements CombatModeAc
             double v = Math.atan(.01 / movementSpeed) * 180 / Math.PI;
             double rotationChange = (v < 10) ? v : 10;
             if(strafingMovement > 0)
-                this.rotationYaw -= rotationChange;
+                setYRot((float) (getYRot() - rotationChange));
             else if(strafingMovement < 0)
-                this.rotationYaw += rotationChange;
+                setYRot((float) (getYRot() + rotationChange));
 
-            this.prevRotationYaw = this.rotationYaw;
-            this.renderYawOffset = this.rotationYaw;
-            this.rotationYawHead = this.renderYawOffset;
+            this.yRotO = this.getYRot();
+            this.yBodyRot = this.getYRot();
+            this.yHeadRot = this.yBodyRot;
 
-            this.rotationPitch = livingentity.rotationPitch * 0.5F;
-            this.setRotation(this.rotationYaw, this.rotationPitch);
+            this.setXRot(livingentity.getXRot() * 0.5F);
+            this.setRot(this.getYRot(), this.getXRot());
 
-            if (this.onGround && this.jumpPower == 0.0F && this.isRearing() && !this.allowStandSliding) {
+            if (this.onGround && this.playerJumpPendingScale == 0.0F && this.isStanding() && !this.allowStandSliding) {
                 forwardMovement = 0.0F;
             }
 
-            if (this.jumpPower > 0.0F && !this.isHorseJumping() && this.onGround) {
-                double d0 = this.getHorseJumpStrength() * (double)this.jumpPower * (double)this.getJumpFactor();
+            if (this.playerJumpPendingScale > 0.0F && !this.isJumping() && this.onGround) {
+                double d0 = this.getCustomJump() * (double)this.playerJumpPendingScale * (double)this.getBlockJumpFactor();
                 double d1;
-                if (this.isPotionActive(Effects.JUMP_BOOST)) {
-                    d1 = d0 + (double)((float)(this.getActivePotionEffect(Effects.JUMP_BOOST).getAmplifier() + 1) * 0.1F);
+                if (this.hasEffect(MobEffects.JUMP)) {
+                    d1 = d0 + (double)((float)(this.getEffect(MobEffects.JUMP).getAmplifier() + 1) * 0.1F);
                 } else {
                     d1 = d0;
                 }
 
-                Vector3d vector3d = this.getMotion();
-                this.setMotion(vector3d.x, d1, vector3d.z);
-                this.setHorseJumping(true);
-                this.isAirBorne = true;
+                Vec3 vector3d = this.getDeltaMovement();
+                this.setDeltaMovement(vector3d.x, d1, vector3d.z);
+                this.setIsJumping(true);
+                this.hasImpulse = true;
                 net.minecraftforge.common.ForgeHooks.onLivingJump(this);
                 if (previousZMotion > 0.0F) {
-                    float f2 = MathHelper.sin(this.rotationYaw * ((float)Math.PI / 180F));
-                    float f3 = MathHelper.cos(this.rotationYaw * ((float)Math.PI / 180F));
-                    this.setMotion(this.getMotion().add((double)(-0.4F * f2 * this.jumpPower), 0.0D, (double)(0.4F * f3 * this.jumpPower)));
+                    float f2 = Mth.sin(this.getYRot() * ((float)Math.PI / 180F));
+                    float f3 = Mth.cos(this.getYRot() * ((float)Math.PI / 180F));
+                    this.setDeltaMovement(this.getDeltaMovement().add(-0.4F * f2 * this.playerJumpPendingScale, 0.0D, 0.4F * f3 * this.playerJumpPendingScale));
                 }
 
-                this.jumpPower = 0.0F;
+                this.playerJumpPendingScale = 0.0F;
             }
 
-            this.jumpMovementFactor = this.getAIMoveSpeed() * 0.1F;
+            this.flyingSpeed = this.getSpeed() * 0.1F;
 
             //Movement
-            if (this.canPassengerSteer()) {
-                this.setAIMoveSpeed(movementSpeed);
-                super.travel(new Vector3d(0, travelVector.y, forwardMovement));
-            } else if (livingentity instanceof PlayerEntity) {
-                this.setMotion(Vector3d.ZERO);
+            if (this.isControlledByLocalInstance()) {
+                this.setSpeed(movementSpeed);
+                super.travel(new Vec3(0, pTravelVector.y, forwardMovement));
+            } else if (livingentity instanceof Player) {
+                this.setDeltaMovement(Vec3.ZERO);
             }
 
             if (this.onGround) {
-                this.jumpPower = 0.0F;
-                this.setHorseJumping(false);
+                this.playerJumpPendingScale = 0.0F;
+                this.setIsJumping(false);
             }
 
-            this.func_233629_a_(this, false);
+            this.calculateEntityAnimation(this, false);
             ci.cancel();
         }
     }
 
-    @Inject(at=@At(value="INVOKE",target="net/minecraft/entity/passive/horse/AbstractHorseEntity.makeHorseRear()V", ordinal=0), method="getAmbientSound()Lnet/minecraft/util/SoundEvent;", cancellable=true)
+    @Inject(at=@At(value="INVOKE",target="Lnet/minecraft/world/entity/animal/horse/AbstractHorse;stand()V", ordinal=0), method="getAmbientSound", cancellable=true)
     private void cancelRandomRearing(CallbackInfoReturnable<SoundEvent> cir) {
-        if(getControllingPassenger() instanceof PlayerEntity && ((CombatModeAccessor) getControllingPassenger()).inCombatMode())
+        if(getControllingPassenger() instanceof Player && ((CombatModeAccessor) getControllingPassenger()).inCombatMode())
             cir.cancel();
     }
 }

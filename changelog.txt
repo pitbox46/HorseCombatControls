@@ -1,3 +1,7 @@
+October 1, 2021 pitbox46
+-Updated to Minecraft 1.17.1
+-Switched to parchment mappings
+
 August 19, 2021 pitbox46
 -Updated Forge version to 36.2.2
 -Should resolve Issue #2
