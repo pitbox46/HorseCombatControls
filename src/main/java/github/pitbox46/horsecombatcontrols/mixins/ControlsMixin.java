@@ -35,10 +35,6 @@ public abstract class ControlsMixin extends LivingEntity {
     }
 
     @Shadow
-    @Nullable
-    public abstract Entity getControllingPassenger();
-
-    @Shadow
     public abstract boolean isStanding();
 
     @Shadow
@@ -50,7 +46,7 @@ public abstract class ControlsMixin extends LivingEntity {
     @Shadow
     public abstract void setIsJumping(boolean pJumping);
 
-    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/animal/horse/AbstractHorse;getControllingPassenger()Lnet/minecraft/world/entity/Entity;", ordinal = 0), method = "travel", cancellable = true)
+    @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/animal/horse/AbstractHorse;getControllingPassenger()Lnet/minecraft/world/entity/LivingEntity;", ordinal = 0), method = "travel", cancellable = true)
     private void travelInject(Vec3 pTravelVector, CallbackInfo ci) {
         if (getControllingPassenger() instanceof Player && HorseCombatControls.isInCombatMode((Player) getControllingPassenger())) {
             Player passenger = (Player) this.getControllingPassenger();

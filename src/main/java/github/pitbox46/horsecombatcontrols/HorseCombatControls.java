@@ -2,7 +2,7 @@ package github.pitbox46.horsecombatcontrols;
 
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -40,7 +40,7 @@ public class HorseCombatControls {
 
     public static void setCombatMode(Player player, boolean flag) {
         if (!flag && Config.LOCK_COMBAT_MODE.get()) {
-            player.displayClientMessage(new TranslatableComponent("message.horsecombatcontrols.locked"), true);
+            player.displayClientMessage(Component.translatable("message.horsecombatcontrols.locked"), true);
             player.getEntityData().set(HORSE_COMBAT_MODE, true);
         } else
             player.getEntityData().set(HORSE_COMBAT_MODE, flag);
