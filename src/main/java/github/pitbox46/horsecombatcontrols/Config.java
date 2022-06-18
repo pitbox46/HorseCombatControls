@@ -8,6 +8,7 @@ public class Config {
     public static ForgeConfigSpec SERVER_CONFIG;
 
     public static ForgeConfigSpec.BooleanValue LOCK_COMBAT_MODE;
+    public static ForgeConfigSpec.BooleanValue CANCEL_RAND_REARING;
 
     static {
         ForgeConfigSpec.Builder SERVER_BUILDER = new ForgeConfigSpec.Builder();
@@ -16,6 +17,8 @@ public class Config {
 
         LOCK_COMBAT_MODE = SERVER_BUILDER.comment("Lock controls to the combat mode")
                 .define("lock_combat_mode", false);
+        CANCEL_RAND_REARING = SERVER_BUILDER.comment("Cancel horse random rearing")
+                .define("cancel_rand_rearing", true);
 
         SERVER_BUILDER.pop();
         SERVER_CONFIG = SERVER_BUILDER.build();

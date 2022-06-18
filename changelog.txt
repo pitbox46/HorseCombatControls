@@ -1,3 +1,7 @@
+June 18, 2022 pitbox46
+-Port to 1.18.2
+-Switch to using entityData rather than a custom data syncing system
+
 October 25, 2021 pitbox46
 -Fixed bug where refmap wouldn't load (how did no one tell me about this until yesterday?!)
 
