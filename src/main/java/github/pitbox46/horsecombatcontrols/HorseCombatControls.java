@@ -1,11 +1,12 @@
 package github.pitbox46.horsecombatcontrols;
 
+import github.pitbox46.horsecombatcontrols.network.ClientProxy;
+import github.pitbox46.horsecombatcontrols.network.CombatModePacket;
+import github.pitbox46.horsecombatcontrols.network.CommonProxy;
+import github.pitbox46.horsecombatcontrols.network.PacketHandler;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -13,6 +14,7 @@ import net.minecraftforge.client.ClientRegistry;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -24,26 +26,24 @@ import org.apache.logging.log4j.Logger;
 @Mod("horsecombatcontrols")
 public class HorseCombatControls {
     public static final Logger LOGGER = LogManager.getLogger();
-    public static final EntityDataAccessor<Boolean> HORSE_COMBAT_MODE = SynchedEntityData.defineId(Player.class, EntityDataSerializers.BOOLEAN);
     private static KeyMapping toggleControls;
+    public static CommonProxy PROXY;
     private int tick = 0;
 
     public HorseCombatControls() {
+        PROXY = DistExecutor.safeRunForDist(() -> ClientProxy::new, () -> CommonProxy::new);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::onClientSetup);
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, Config.SERVER_CONFIG);
         MinecraftForge.EVENT_BUS.register(this);
     }
 
     public static boolean isInCombatMode(Player player) {
-        return player.getEntityData().get(HORSE_COMBAT_MODE);
+        return ((CombatModeAccessor) player).inCombatMode();
     }
 
-    public static void setCombatMode(Player player, boolean flag) {
-        if (!flag && Config.LOCK_COMBAT_MODE.get()) {
-            player.displayClientMessage(new TranslatableComponent("message.horsecombatcontrols.locked"), true);
-            player.getEntityData().set(HORSE_COMBAT_MODE, true);
-        } else
-            player.getEntityData().set(HORSE_COMBAT_MODE, flag);
+    public static void setCombatModeClientVersion(Player player, boolean flag) {
+        ((CombatModeAccessor) player).setCombatMode(flag);
+        PacketHandler.CHANNEL.sendToServer(new CombatModePacket(flag));
     }
 
     private void onClientSetup(final FMLClientSetupEvent event) {
@@ -57,10 +57,15 @@ public class HorseCombatControls {
         Player player = Minecraft.getInstance().player;
         if (player != null && event.phase == TickEvent.Phase.END) {
             if (toggleControls.consumeClick()) {
-                setCombatMode(player, !isInCombatMode(player));
+                if(Config.LOCK_COMBAT_MODE.get()) {
+                    player.displayClientMessage(new TranslatableComponent("message.horsecombatcontrols.locked"), true);
+                    setCombatModeClientVersion(player, true);
+                }
+                else
+                    setCombatModeClientVersion(player, !isInCombatMode(player));
             }
             if (tick++ > 100 && Config.LOCK_COMBAT_MODE.get()) {
-                setCombatMode(player, true);
+                setCombatModeClientVersion(player, true);
                 tick = 0;
             }
         }

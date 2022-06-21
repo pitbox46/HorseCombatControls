@@ -1,3 +1,6 @@
+June 20, 2022 pitbox46
+-Move away from entityData as it isn't meant to be used this way
+
 June 18, 2022 pitbox46
 -Port to 1.18.2
 -Switch to using entityData rather than a custom data syncing system
