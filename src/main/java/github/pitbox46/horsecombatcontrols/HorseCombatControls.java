@@ -11,7 +11,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.ClientRegistry;
+import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -49,14 +49,14 @@ public class HorseCombatControls {
         PacketHandler.CHANNEL.sendToServer(new CombatModePacket(flag));
     }
 
-    private void onClientSetup(final FMLClientSetupEvent event) {
+    private void onClientSetup(final RegisterKeyMappingsEvent event) {
         toggleControls = new KeyMapping("key.horsecombatcontrols.toggle", 89, "key.horsecombatcontrols.category");
-        ClientRegistry.registerKeyBinding(toggleControls);
+        event.register(toggleControls);
     }
 
     @SubscribeEvent
     public void onPlayerLog(PlayerEvent.PlayerLoggedInEvent event) {
-        if(!(event.getPlayer() instanceof ServerPlayer player)) return;
+        if(!(event.getEntity() instanceof ServerPlayer player)) return;
         PacketHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new CombatModePacket(isInCombatMode(player)));
     }
 
