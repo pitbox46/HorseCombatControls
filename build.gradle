@@ -22,7 +22,7 @@ mixin {
 }
 
 group = 'github.pitbox46'
-version = '1.19.2-1.0.1'
+version = '1.19.3-1.0.0'
 archivesBaseName = 'horsecombatcontrols'
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '17'
@@ -109,7 +109,7 @@ dependencies {
     // Specify the version of Minecraft to use, If this is any group other then 'net.minecraft' it is assumed
     // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
-    minecraft 'net.minecraftforge:forge:1.19.2-43.1.47'
+    minecraft 'net.minecraftforge:forge:1.19.3-44.1.5'
 
 //    runtimeOnly fg.deobf('curse.maven:spark-361579:3828094')
 
