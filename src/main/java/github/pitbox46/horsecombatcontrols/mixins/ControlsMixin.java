@@ -45,8 +45,7 @@ public abstract class ControlsMixin extends LivingEntity {
 
     @Inject(at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/animal/horse/AbstractHorse;getControllingPassenger()Lnet/minecraft/world/entity/LivingEntity;", ordinal = 0), method = "travel", cancellable = true)
     private void travelInject(Vec3 pTravelVector, CallbackInfo ci) {
-        if (getControllingPassenger() instanceof Player && HorseCombatControls.isInCombatMode((Player) getControllingPassenger())) {
-            Player passenger = (Player) this.getControllingPassenger();
+        if (getControllingPassenger() instanceof Player passenger && HorseCombatControls.isInCombatMode(passenger)) {
             float strafingMovement = passenger.xxa * 0.5F;
             float forwardMovement = passenger.zza;
 
@@ -73,11 +72,11 @@ public abstract class ControlsMixin extends LivingEntity {
             this.setXRot(passenger.getXRot() * 0.5F);
             this.setRot(this.getYRot(), this.getXRot());
 
-            if (this.onGround && this.playerJumpPendingScale == 0.0F && this.isStanding() && !this.allowStandSliding) {
+            if (this.onGround() && this.playerJumpPendingScale == 0.0F && this.isStanding() && !this.allowStandSliding) {
                 forwardMovement = 0.0F;
             }
 
-            if (this.playerJumpPendingScale > 0.0F && !this.isJumping() && this.onGround) {
+            if (this.playerJumpPendingScale > 0.0F && !this.isJumping() && this.onGround()) {
                 double d0 = this.getCustomJump() * (double) this.playerJumpPendingScale * (double) this.getBlockJumpFactor();
                 double d1;
                 if (this.hasEffect(MobEffects.JUMP)) {
@@ -110,12 +109,12 @@ public abstract class ControlsMixin extends LivingEntity {
                 this.setDeltaMovement(Vec3.ZERO);
             }
 
-            if (this.onGround) {
+            if (this.onGround()) {
                 this.playerJumpPendingScale = 0.0F;
                 this.setIsJumping(false);
             }
 
-            this.calculateEntityAnimation(this, false);
+            this.calculateEntityAnimation(false);
             ci.cancel();
         }
     }
