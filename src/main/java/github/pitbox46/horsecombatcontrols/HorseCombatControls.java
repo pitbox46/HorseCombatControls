@@ -1,41 +1,66 @@
 package github.pitbox46.horsecombatcontrols;
 
-import github.pitbox46.horsecombatcontrols.network.ClientProxy;
+import github.pitbox46.horsecombatcontrols.network.ModClientPayloadHandler;
 import github.pitbox46.horsecombatcontrols.network.CombatModePacket;
-import github.pitbox46.horsecombatcontrols.network.CommonProxy;
-import github.pitbox46.horsecombatcontrols.network.PacketHandler;
+import github.pitbox46.horsecombatcontrols.network.ModServerPayloadHandler;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlerEvent;
+import net.neoforged.neoforge.network.registration.IPayloadRegistrar;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-@Mod("horsecombatcontrols")
+@Mod(HorseCombatControls.MODID)
 public class HorseCombatControls {
+    public static final String MODID = "horsecombatcontrols";
     public static final Logger LOGGER = LogManager.getLogger();
 
-    public static CommonProxy PROXY;
-
-    public HorseCombatControls() {
-        PROXY = DistExecutor.safeRunForDist(() -> ClientProxy::new, () -> CommonProxy::new);
+    public HorseCombatControls(IEventBus bus) {
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, Config.SERVER_CONFIG);
-        MinecraftForge.EVENT_BUS.register(this);
+        NeoForge.EVENT_BUS.addListener(this::onPlayerLog);
+        NeoForge.EVENT_BUS.addListener(ModClientPayloadHandler::onClientTick);
+        bus.addListener(this::registerPackets);
+        bus.addListener(ModClientPayloadHandler::registerBindings);
     }
 
     public static boolean isInCombatMode(Player player) {
-        return ((CombatModeAccessor) player).inCombatMode();
+        return ((PlayerDuck) player).horseCombatControls$inCombatMode();
+    }
+
+    public void registerPackets(final RegisterPayloadHandlerEvent event) {
+        IPayloadRegistrar registrar = event.registrar(MODID);
+        registrar.play(CombatModePacket.ID, CombatModePacket::new, handler -> handler
+                .client((payload, context) -> {
+                    context.workHandler().submitAsync(() -> {
+                        ModClientPayloadHandler.getInstance().handle(payload, context);
+                    }).exceptionally(e -> {
+                        context.packetHandler().disconnect(Component.literal(e.getMessage()));
+                        return null;
+                    });
+                })
+                .server((payload, context) -> {
+                    context.workHandler().submitAsync(() -> {
+                        ModServerPayloadHandler.getInstance().handle(payload, context);
+                    }).exceptionally(e -> {
+                        context.packetHandler().disconnect(Component.literal(e.getMessage()));
+                        return null;
+                    });
+                }));
     }
 
     @SubscribeEvent
     public void onPlayerLog(PlayerEvent.PlayerLoggedInEvent event) {
-        if(!(event.getEntity() instanceof ServerPlayer player)) return;
-        CommonProxy.setCombatModeServerVersion(player, isInCombatMode(player));
+        if(!(event.getEntity() instanceof ServerPlayer player)) {
+            return;
+        }
+        ModServerPayloadHandler.setCombatModeServerVersion(player, isInCombatMode(player));
     }
 }
