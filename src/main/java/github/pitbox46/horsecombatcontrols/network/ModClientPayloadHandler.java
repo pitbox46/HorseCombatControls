@@ -7,12 +7,18 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.common.util.Lazy;
 import net.neoforged.neoforge.event.TickEvent;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.PlayPayloadContext;
 
+@OnlyIn(Dist.CLIENT)
+@Mod.EventBusSubscriber(value = Dist.CLIENT)
 public class ModClientPayloadHandler {
     private static final Lazy<KeyMapping> TOGGLE_CONTROLS = Lazy.of(() -> new KeyMapping("key.horsecombatcontrols.toggle", 89, "key.horsecombatcontrols.category"));
 
@@ -22,10 +28,7 @@ public class ModClientPayloadHandler {
         return INSTANCE;
     }
 
-    public static void registerBindings(RegisterKeyMappingsEvent event) {
-        event.register(TOGGLE_CONTROLS.get());
-    }
-
+    @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         Player player = Minecraft.getInstance().player;
         if(player == null || event.phase != TickEvent.Phase.END)
@@ -60,5 +63,13 @@ public class ModClientPayloadHandler {
             Minecraft.getInstance().player.displayClientMessage(Component.translatable("message.horsecombatcontrols.locked"), true);
         }
         accessor.horseCombatControls$setCombatMode(msg.combatMode());
+    }
+
+    @Mod.EventBusSubscriber(value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD, modid = HorseCombatControls.MODID)
+    static class ModEvents {
+        @SubscribeEvent
+        public static void registerBindings(RegisterKeyMappingsEvent event) {
+            event.register(TOGGLE_CONTROLS.get());
+        }
     }
 }

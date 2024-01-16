@@ -47,7 +47,7 @@ public abstract class AbstractHorseMixin extends LivingEntity {
             cir.setReturnValue(new Vec2(pEntity.getXRot() * 0.5F, (float) (getYRot() + (deltaRot * (strafingMovement < 0 ? 1:-1)))));
         }
         //Remote players should just use the rotation provided by the server
-        if (pEntity instanceof RemotePlayer) {
+        if (pEntity.level().isClientSide() && pEntity instanceof RemotePlayer) {
             cir.setReturnValue(new Vec2(getXRot(), getYRot()));
         }
     }

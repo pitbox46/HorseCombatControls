@@ -26,9 +26,7 @@ public class HorseCombatControls {
     public HorseCombatControls(IEventBus bus) {
         ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, Config.SERVER_CONFIG);
         NeoForge.EVENT_BUS.addListener(this::onPlayerLog);
-        NeoForge.EVENT_BUS.addListener(ModClientPayloadHandler::onClientTick);
         bus.addListener(this::registerPackets);
-        bus.addListener(ModClientPayloadHandler::registerBindings);
     }
 
     public static boolean isInCombatMode(Player player) {
