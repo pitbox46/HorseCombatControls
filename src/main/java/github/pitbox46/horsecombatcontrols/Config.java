@@ -1,17 +1,17 @@
 package github.pitbox46.horsecombatcontrols;
 
-import net.neoforged.neoforge.common.ModConfigSpec;
+import net.minecraftforge.common.ForgeConfigSpec;
 
 public class Config {
     public static final String CATEGORY_GENERAL = "general";
 
-    public static ModConfigSpec SERVER_CONFIG;
+    public static ForgeConfigSpec SERVER_CONFIG;
 
-    public static ModConfigSpec.BooleanValue LOCK_COMBAT_MODE;
-    public static ModConfigSpec.BooleanValue CANCEL_RAND_REARING;
+    public static ForgeConfigSpec.BooleanValue LOCK_COMBAT_MODE;
+    public static ForgeConfigSpec.BooleanValue CANCEL_RAND_REARING;
 
     static {
-        ModConfigSpec.Builder SERVER_BUILDER = new ModConfigSpec.Builder();
+        ForgeConfigSpec.Builder SERVER_BUILDER = new ForgeConfigSpec.Builder();
 
         SERVER_BUILDER.comment("General Settings").push(CATEGORY_GENERAL);
 
