@@ -18,7 +18,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(AbstractHorse.class)
-public abstract class AbstractHorseMixin extends LivingEntity {
+public abstract class AbstractHorseMixinClient extends LivingEntity {
     @Shadow
     protected float playerJumpPendingScale;
     @Shadow
@@ -26,7 +26,7 @@ public abstract class AbstractHorseMixin extends LivingEntity {
     @Unique
     private double horseCombatControls$prevSpeedPercent = 0F;
 
-    protected AbstractHorseMixin(EntityType<? extends LivingEntity> type, Level worldIn) {
+    protected AbstractHorseMixinClient(EntityType<? extends LivingEntity> type, Level worldIn) {
         super(type, worldIn);
     }
 
@@ -35,6 +35,10 @@ public abstract class AbstractHorseMixin extends LivingEntity {
 
     @Inject(at = @At(value = "HEAD"), method = "getRiddenRotation", cancellable = true)
     private void replaceGetRiddenRotation(LivingEntity pEntity, CallbackInfoReturnable<Vec2> cir) {
+        //Remote players should just use the rotation provided by the server
+        if (pEntity.level().isClientSide() && pEntity instanceof RemotePlayer) {
+            cir.setReturnValue(new Vec2(getXRot(), getYRot()));
+        }
         if (pEntity instanceof Player player && HorseCombatControls.isInCombatMode(player)) {
             float strafingMovement = pEntity.xxa * 0.5F;
             //Faster current speed -> slower rotation
@@ -45,10 +49,6 @@ public abstract class AbstractHorseMixin extends LivingEntity {
             }
 
             cir.setReturnValue(new Vec2(pEntity.getXRot() * 0.5F, (float) (getYRot() + (deltaRot * (strafingMovement < 0 ? 1:-1)))));
-        }
-        //Remote players should just use the rotation provided by the server
-        if (pEntity.level().isClientSide() && pEntity instanceof RemotePlayer) {
-            cir.setReturnValue(new Vec2(getXRot(), getYRot()));
         }
     }
 
