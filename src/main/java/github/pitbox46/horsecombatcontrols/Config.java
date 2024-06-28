@@ -17,7 +17,7 @@ public class Config {
 
         LOCK_COMBAT_MODE = SERVER_BUILDER.comment("Lock controls to the combat mode")
                 .define("lock_combat_mode", false);
-        CANCEL_RAND_REARING = SERVER_BUILDER.comment("Cancel horse random rearing")
+        CANCEL_RAND_REARING = SERVER_BUILDER.comment("Cancel horse random and hurt rearing")
                 .define("cancel_rand_rearing", true);
 
         SERVER_BUILDER.pop();

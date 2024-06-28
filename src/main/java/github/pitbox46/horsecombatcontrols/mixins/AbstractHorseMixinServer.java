@@ -14,6 +14,8 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(AbstractHorse.class)
@@ -31,6 +33,8 @@ public abstract class AbstractHorseMixinServer extends LivingEntity {
 
     @Shadow
     public abstract boolean isStanding();
+
+    @Shadow public abstract void standIfPossible();
 
     @Inject(at = @At(value = "HEAD"), method = "getRiddenRotation", cancellable = true)
     private void replaceGetRiddenRotation(LivingEntity pEntity, CallbackInfoReturnable<Vec2> cir) {
@@ -74,9 +78,18 @@ public abstract class AbstractHorseMixinServer extends LivingEntity {
         }
     }
 
-    @Inject(at = @At(value = "HEAD"), method = "canPerformRearing", cancellable = true)
-    private void cancelRandomRearing(CallbackInfoReturnable<Boolean> cir) {
-        if (Config.CANCEL_RAND_REARING.get() && getControllingPassenger() instanceof Player && HorseCombatControls.isInCombatMode((Player) getControllingPassenger()))
-            cir.setReturnValue(false);
+    @Inject(method = "getAmbientStandInterval", at = @At("HEAD"), cancellable = true)
+    private void cancelRandomRearing(CallbackInfoReturnable<Integer> cir) {
+        if (Config.CANCEL_RAND_REARING.get()) {
+            cir.setReturnValue(Integer.MAX_VALUE);
+        }
+    }
+
+    @Redirect(method = "hurt", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/animal/horse/AbstractHorse;standIfPossible()V"))
+    private void cancelHurtRearing(AbstractHorse instance) {
+        if (Config.CANCEL_RAND_REARING.get()) {
+            return;
+        }
+        standIfPossible();
     }
 }
