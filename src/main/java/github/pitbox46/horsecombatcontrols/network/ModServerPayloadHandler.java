@@ -1,5 +1,6 @@
 package github.pitbox46.horsecombatcontrols.network;
 
+import github.pitbox46.horsecombatcontrols.HorseCombatControls;
 import github.pitbox46.horsecombatcontrols.PlayerDuck;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
@@ -16,7 +17,12 @@ public class ModServerPayloadHandler {
     }
 
     public static void handle(CombatModePacket msg, IPayloadContext ctx) {
-        Player player = ctx.player();
-        ((PlayerDuck) player).horseCombatControls$setCombatMode(msg.combatMode());
+        ctx.enqueueWork(() -> {
+            Player player = ctx.player();
+            ((PlayerDuck) player).horseCombatControls$setCombatMode(msg.combatMode());
+        }).exceptionally(throwable -> {
+            HorseCombatControls.LOGGER.catching(throwable);
+            return null;
+        });
     }
 }

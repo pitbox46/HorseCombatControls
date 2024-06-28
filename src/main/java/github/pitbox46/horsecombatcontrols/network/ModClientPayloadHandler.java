@@ -57,14 +57,19 @@ public class ModClientPayloadHandler {
     //Handlers
 
     public static void handle(CombatModePacket msg, IPayloadContext ctx) {
-        if(Minecraft.getInstance().player == null) {
-            return;
-        }
-        PlayerDuck accessor = (PlayerDuck) Minecraft.getInstance().player;
-        if(!accessor.horseCombatControls$inCombatMode() && msg.combatMode()) {
-            Minecraft.getInstance().player.displayClientMessage(Component.translatable("message.horsecombatcontrols.locked"), true);
-        }
-        accessor.horseCombatControls$setCombatMode(msg.combatMode());
+        ctx.enqueueWork(() -> {
+            if (Minecraft.getInstance().player == null) {
+                return;
+            }
+            PlayerDuck accessor = (PlayerDuck) Minecraft.getInstance().player;
+            if (!accessor.horseCombatControls$inCombatMode() && msg.combatMode()) {
+                Minecraft.getInstance().player.displayClientMessage(Component.translatable("message.horsecombatcontrols.locked"), true);
+            }
+            accessor.horseCombatControls$setCombatMode(msg.combatMode());
+        }).exceptionally(throwable -> {
+            HorseCombatControls.LOGGER.catching(throwable);
+            return null;
+        });
     }
 
     @EventBusSubscriber(value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD, modid = HorseCombatControls.MODID)
