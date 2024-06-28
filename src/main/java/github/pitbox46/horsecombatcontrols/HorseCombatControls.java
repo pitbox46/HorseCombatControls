@@ -4,15 +4,11 @@ import com.mojang.serialization.Codec;
 import github.pitbox46.horsecombatcontrols.network.ModClientPayloadHandler;
 import github.pitbox46.horsecombatcontrols.network.CombatModePacket;
 import github.pitbox46.horsecombatcontrols.network.ModServerPayloadHandler;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.attachment.AttachmentType;
-import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.DirectionalPayloadHandler;
