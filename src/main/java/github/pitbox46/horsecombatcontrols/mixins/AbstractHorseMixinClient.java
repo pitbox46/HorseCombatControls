@@ -47,7 +47,8 @@ public abstract class AbstractHorseMixinClient extends LivingEntity {
             float strafingMovement = pEntity.xxa * 0.5F;
             //Faster current speed -> slower rotation
             double deltaRotRaw = Math.atan(.05 / Math.abs(horseCombatControls$prevSpeedPercent)) * 180 / Math.PI;
-            double deltaRot = Math.min(deltaRotRaw, 10); //Bound the speed at 10 degrees per tick
+            deltaRotRaw *= Config.ROT_MULTI.get();
+            double deltaRot = Math.min(deltaRotRaw, 10 * Config.ROT_MULTI.get()); //Bound the speed at 10 degrees per tick
             if (Math.abs(strafingMovement) == 0) {
                 deltaRot = 0;
             }
