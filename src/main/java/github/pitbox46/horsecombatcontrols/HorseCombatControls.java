@@ -10,6 +10,8 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.attachment.AttachmentType;
 
+import net.neoforged.neoforge.client.gui.ConfigurationScreen;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.handling.DirectionalPayloadHandler;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
@@ -27,6 +29,7 @@ public class HorseCombatControls {
 
     public HorseCombatControls(ModContainer container) {
         container.registerConfig(ModConfig.Type.SERVER, Config.SERVER_CONFIG);
+        container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
         container.getEventBus().addListener(this::registerPackets);
         ATTACHMENT_TYPES.register(container.getEventBus());
     }

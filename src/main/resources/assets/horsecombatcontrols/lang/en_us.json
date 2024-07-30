@@ -2,5 +2,10 @@
   "key.horsecombatcontrols.toggle": "Toggle horse combat controls",
   "key.horsecombatcontrols.category": "Horse Combat Controls",
 
-  "message.horsecombatcontrols.locked": "Horse combat controls are enforced by the world"
+  "message.horsecombatcontrols.locked": "Horse combat controls are enforced by the world",
+
+  "horsecombatcontrols.configuration.rot_mutli": "Rotation Multiplier",
+  "horsecombatcontrols.configuration.lock_combat_mode": "Lock Combat Mode",
+  "horsecombatcontrols.configuration.cancel_rand_rearing": "Cancel Random Rearing",
+  "horsecombatcontrols.configuration.general": "General"
 }
