@@ -15,6 +15,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(AbstractHorse.class)
@@ -80,10 +81,17 @@ public abstract class AbstractHorseMixinClient extends LivingEntity {
         }
     }
 
-    @Inject(at = @At(value = "HEAD"), method = "canPerformRearing", cancellable = true)
-    private void cancelRandomRearing(CallbackInfoReturnable<Boolean> cir) {
-        if (Config.CANCEL_RAND_REARING.get() && getControllingPassenger() instanceof Player && HorseCombatControls.isInCombatMode((Player) getControllingPassenger())) {
-            cir.setReturnValue(false);
+    @Inject(method = "getAmbientStandInterval", at = @At("HEAD"), cancellable = true)
+    private void cancelRandomRearing(CallbackInfoReturnable<Integer> cir) {
+        if (Config.CANCEL_RAND_REARING.get()) {
+            cir.setReturnValue(Integer.MAX_VALUE);
+        }
+    }
+
+    @Inject(method = "makeMad", at = @At("HEAD"), cancellable = true)
+    private void cancelMakeRearing(CallbackInfo ci) {
+        if (Config.CANCEL_RAND_REARING.get()) {
+            ci.cancel();
         }
     }
 }
