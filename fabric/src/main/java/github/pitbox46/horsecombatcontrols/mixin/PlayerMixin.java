@@ -1,7 +1,8 @@
-package github.pitbox46.horsecombatcontrols.mixins;
+package github.pitbox46.horsecombatcontrols.mixin;
 
+import github.pitbox46.horsecombatcontrols.HCCConfigModel;
+import github.pitbox46.horsecombatcontrols.HorseCombatControls;
 import github.pitbox46.horsecombatcontrols.PlayerDuck;
-import github.pitbox46.horsecombatcontrols.Config;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -32,16 +33,16 @@ public abstract class PlayerMixin extends Entity implements PlayerDuck {
         if(pCompound.contains("combatMode"))
             this.horseCombatControls$setCombatMode(pCompound.getBoolean("combatMode"));
         else
-            this.horseCombatControls$setCombatMode(Config.LOCK_COMBAT_MODE.get());
+            this.horseCombatControls$setCombatMode(HorseCombatControls.CONFIG.lockCombatMode());
     }
 
     @Override
     public boolean horseCombatControls$inCombatMode() {
-        return Config.LOCK_COMBAT_MODE.get() || horseCombatControls$combatMode;
+        return HorseCombatControls.CONFIG.lockCombatMode() || horseCombatControls$combatMode;
     }
 
     @Override
     public void horseCombatControls$setCombatMode(boolean flag) {
-        this.horseCombatControls$combatMode = Config.LOCK_COMBAT_MODE.get() || flag;
+        this.horseCombatControls$combatMode = HorseCombatControls.CONFIG.lockCombatMode() || flag;
     }
 }

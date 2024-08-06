@@ -1,0 +1,15 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "github.pitbox46.horsecombatcontrols.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "server": [
+    "AbstractHorseMixinServer"
+  ],
+  "mixins": [
+    "PlayerMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "horsecombatcontrols",
+  "version": "${version}",
+
+  "name": "Horse Combat Controls",
+  "description": "",
+  "authors": [],
+  "contact": {},
+
+  "license": "MIT",
+  "icon": "assets/horsecombatcontrols/icon.png",
+
+  "environment": "*",
+  "entrypoints": {
+    "client": [
+      "github.pitbox46.horsecombatcontrols.client.HorseCombatControlsClient"
+    ],
+    "main": ["github.pitbox46.horsecombatcontrols.HorseCombatControls"]
+  },
+
+  "mixins": [
+    "horsecombatcontrols.mixins.json"
+    ,{
+      "config": "horsecombatcontrols.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
