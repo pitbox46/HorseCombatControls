@@ -44,16 +44,14 @@ public class HorseCombatControlsClient implements ClientModInitializer {
             }
         });
 
-        ClientPlayNetworking.registerGlobalReceiver(CombatModePacket.ID, ((client, handler, buf, responseSender) -> {
-            boolean flag = buf.readBoolean();
-            client.execute(() -> combatMode = flag);
+        ClientPlayNetworking.registerGlobalReceiver(CombatModePacket.TYPE, ((packet, context) -> {
+            boolean flag = packet.combatMode();
+            context.client().execute(() -> combatMode = flag);
         }));
     }
 
     public static void setCombatModeClientVersion(Player player, boolean flag) {
         combatMode = flag;
-        FriendlyByteBuf buf = PacketByteBufs.create();
-        buf.writeBoolean(combatMode);
-        ClientPlayNetworking.send(CombatModePacket.ID, buf);
+        ClientPlayNetworking.send(new CombatModePacket(combatMode));
     }
 }

@@ -4,6 +4,7 @@ import github.pitbox46.horsecombatcontrols.HCCConfig;
 import github.pitbox46.horsecombatcontrols.network.CombatModePacket;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.networking.v1.PacketByteBufs;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.network.FriendlyByteBuf;
@@ -19,14 +20,18 @@ public class HorseCombatControls implements ModInitializer {
     @Override
     public void onInitialize() {
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-            FriendlyByteBuf buf = PacketByteBufs.create();
-            buf.writeBoolean(isInCombatMode(handler.getPlayer()));
-            ServerPlayNetworking.send(handler.getPlayer(), CombatModePacket.ID, buf);
+            ServerPlayNetworking.send(
+                    handler.getPlayer(),
+                    new CombatModePacket(isInCombatMode(handler.getPlayer()))
+            );
         });
 
-        ServerPlayNetworking.registerGlobalReceiver(CombatModePacket.ID, ((server, player, handler, buf, responseSender) -> {
-            boolean flag = buf.readBoolean();
-            server.execute(() -> ((PlayerDuck) player).horseCombatControls$setCombatMode(flag));
+        PayloadTypeRegistry.playC2S().register(CombatModePacket.TYPE, CombatModePacket.CODEC);
+        PayloadTypeRegistry.playS2C().register(CombatModePacket.TYPE, CombatModePacket.CODEC);
+
+        ServerPlayNetworking.registerGlobalReceiver(CombatModePacket.TYPE, ((payload, context) -> {
+            boolean flag = payload.combatMode();
+            context.server().execute(() -> ((PlayerDuck) context.player()).horseCombatControls$setCombatMode(flag));
         }));
     }
 
