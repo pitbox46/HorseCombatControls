@@ -9,15 +9,18 @@ import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.client.gui.ConfigurationScreen;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.util.Lazy;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-@OnlyIn(Dist.CLIENT)
 @EventBusSubscriber(value = Dist.CLIENT)
 public class ModClientPayloadHandler {
     private static final Lazy<KeyMapping> TOGGLE_CONTROLS = Lazy.of(() -> new KeyMapping("key.horsecombatcontrols.toggle", 89, "key.horsecombatcontrols.category"));
@@ -75,10 +78,14 @@ public class ModClientPayloadHandler {
     }
 
     @EventBusSubscriber(value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD, modid = HorseCombatControls.MODID)
-    static class ModEvents {
+    public static class ModEvents {
         @SubscribeEvent
         public static void registerBindings(RegisterKeyMappingsEvent event) {
             event.register(TOGGLE_CONTROLS.get());
+        }
+
+        public static void onClientSetup(FMLClientSetupEvent clientSetupEvent, ModContainer container) {
+            container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
         }
     }
 }
