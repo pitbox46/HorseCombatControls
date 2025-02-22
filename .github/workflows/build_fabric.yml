@@ -44,3 +44,5 @@ jobs:
           files: |
             fabric/build/libs/!(*-@(dev|sources|javadoc)).jar
             fabric/build/libs/*-@(dev|sources|javadoc).jar
+
+          changelog-file: CHANGELOG.*

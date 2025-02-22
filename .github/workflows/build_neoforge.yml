@@ -44,3 +44,5 @@ jobs:
           files: |
             neoforge/build/libs/!(*-@(dev|sources|javadoc)).jar
             neoforge/build/libs/*-@(dev|sources|javadoc).jar
+
+          changelog-file: CHANGELOG.*
