@@ -1,2 +1,2 @@
-- Use mc-publish
-- Open Minecraft version range
+- Bump version
+- Add top range for Minecraft version
