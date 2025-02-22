@@ -36,14 +36,14 @@ jobs:
       - name: mc-publish fabric
         uses: Kira-NT/mc-publish@v3.3.0
         with:
-          files: |
-            fabric/build/libs/!(*-@(dev|sources|javadoc)).jar
-            fabric/build/libs/*-@(dev|sources|javadoc).jar
-            neoforge/build/libs/!(*-@(dev|sources|javadoc)).jar
-            neoforge/build/libs/*-@(dev|sources|javadoc).jar
-
           modrinth-id: Ye73E82r
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
 
           curseforge-id: 476789
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
+
+          files: |
+            fabric/build/libs/!(*-@(dev|sources|javadoc)).jar
+            fabric/build/libs/*-@(dev|sources|javadoc).jar
+            neoforge/build/libs/!(*-@(dev|sources|javadoc)).jar
+            neoforge/build/libs/*-@(dev|sources|javadoc).jar
