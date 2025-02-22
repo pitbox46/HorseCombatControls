@@ -1,4 +1,4 @@
-name: Build
+name: Build Fabric
 
 on:
   workflow_dispatch:
