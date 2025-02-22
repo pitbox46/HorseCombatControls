@@ -37,12 +37,12 @@ jobs:
         uses: Kira-NT/mc-publish@v3.3.0
         with:
           files: |
-            cd fabric
-            ./build/libs/!(*-@(dev|sources|javadoc)).jar
-            ./build/libs/*-@(dev|sources|javadoc).jar)
-            cd neoforge
-            ./build/libs/!(*-@(dev|sources|javadoc)).jar
-            ./build/libs/*-@(dev|sources|javadoc).jar
+            (cd fabric
+            & ./build/libs/!(*-@(dev|sources|javadoc)).jar
+            & ./build/libs/*-@(dev|sources|javadoc).jar)) &&
+            (cd neoforge
+            & ./build/libs/!(*-@(dev|sources|javadoc)).jar
+            & ./build/libs/*-@(dev|sources|javadoc).jar)
 
           modrinth-id: Ye73E82r
           modrinth-token: ${{ secrets.MODRINTH_TOKEN }}
