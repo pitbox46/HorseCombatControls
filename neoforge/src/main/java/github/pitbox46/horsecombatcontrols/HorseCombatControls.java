@@ -8,6 +8,7 @@ import net.minecraft.world.entity.player.Player;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.attachment.AttachmentType;
 
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
@@ -29,7 +30,7 @@ public class HorseCombatControls {
 
     public HorseCombatControls(ModContainer container) {
         container.registerConfig(ModConfig.Type.SERVER, Config.SERVER_CONFIG);
-        container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
+        container.getEventBus().<FMLClientSetupEvent>addListener(event -> ModClientPayloadHandler.ModEvents.onClientSetup(event, container));
         container.getEventBus().addListener(this::registerPackets);
         ATTACHMENT_TYPES.register(container.getEventBus());
     }
@@ -48,7 +49,10 @@ public class HorseCombatControls {
                 CombatModePacket.TYPE,
                 CombatModePacket.CODEC,
                 new DirectionalPayloadHandler<>(
-                        ModClientPayloadHandler::handle,
+                        //Double wrapped to avoid invalid dist crash
+                        (msg, ctx) -> {
+                            ((Runnable) () -> ModClientPayloadHandler.handle(msg, ctx)).run();
+                        },
                         ModServerPayloadHandler::handle
                 )
         );
