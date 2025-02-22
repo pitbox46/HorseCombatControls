@@ -31,10 +31,9 @@ jobs:
 
       - name: Build with Gradle
         run: |
-          (cd fabric && ./gradlew build) &
           (cd neoforge && ./gradlew build)
 
-      - name: mc-publish fabric
+      - name: mc-publish neoforge
         uses: Kira-NT/mc-publish@v3.3.0
         with:
           modrinth-id: Ye73E82r
@@ -44,7 +43,5 @@ jobs:
           curseforge-token: ${{ secrets.CURSEFORGE_TOKEN }}
 
           files: |
-            fabric/build/libs/!(*-@(dev|sources|javadoc)).jar
-            fabric/build/libs/*-@(dev|sources|javadoc).jar
             neoforge/build/libs/!(*-@(dev|sources|javadoc)).jar
             neoforge/build/libs/*-@(dev|sources|javadoc).jar
