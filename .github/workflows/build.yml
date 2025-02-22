@@ -18,10 +18,11 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
       - name: Build with Gradle
-        uses: gradle/gradle-build-action@v2
-        with:
-          arguments: build
+        run: ./fabric/gradlew build & ./neoforge/gradlew build
 
       - name: mc-publish
         uses: Kira-NT/mc-publish@v3.3.0
