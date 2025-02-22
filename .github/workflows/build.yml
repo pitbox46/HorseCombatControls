@@ -22,7 +22,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
 
       - name: Build with Gradle
-        run: ./fabric/gradlew build & ./neoforge/gradlew build
+        run: (cd fabric && ./gradlew build) & (cd neoforge && ./gradlew build)
 
       - name: mc-publish
         uses: Kira-NT/mc-publish@v3.3.0
