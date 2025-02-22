@@ -3,7 +3,7 @@ name: Build
 on:
   workflow_dispatch:
 
-env: Minecraft Mods
+env: minecraft
 
 jobs:
   build:
