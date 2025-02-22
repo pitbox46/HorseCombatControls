@@ -3,6 +3,8 @@ name: Build
 on:
   workflow_dispatch:
 
+env: Minecraft Mods
+
 jobs:
   build:
     runs-on: ubuntu-latest
