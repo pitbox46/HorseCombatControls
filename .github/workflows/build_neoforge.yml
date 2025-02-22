@@ -26,7 +26,6 @@ jobs:
 
       - name: Grant Execute Permission for Gradle
         run: |
-          chmod +x fabric/gradlew
           chmod +x neoforge/gradlew
 
       - name: Build with Gradle
