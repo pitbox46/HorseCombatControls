@@ -12,9 +12,13 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.network.NetworkEvent;
+
+import java.lang.reflect.Field;
+import java.util.function.Consumer;
 
 public class ClientProxy extends CommonProxy {
     private static KeyMapping toggleControls;
@@ -24,6 +28,7 @@ public class ClientProxy extends CommonProxy {
         MinecraftForge.EVENT_BUS.register(this);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(Events::onClientSetup);
         MinecraftForge.EVENT_BUS.addListener(Events::onClientTick);
+        MinecraftForge.EVENT_BUS.addListener(Events::onClientWorldStart);
     }
 
     @Override
@@ -34,6 +39,31 @@ public class ClientProxy extends CommonProxy {
 
     @OnlyIn(Dist.CLIENT)
     static class Events {
+        private static void onClientWorldStart(LevelEvent.Load event) {
+            // Stop Leawind from using weird controls
+            try {
+                Class<?> clazz = Class.forName("com.github.leawind.thirdperson.api.base.GameEvents");
+                Field field = clazz.getField("calculateMoveImpulse");
+                Consumer<Object> calculateMoveImpulse = (Consumer<Object>) field.get(null);
+
+                field.set(null, (Consumer<Object>) e -> {
+                    Player player;
+                    if (Minecraft.getInstance() != null &&
+                            (player = Minecraft.getInstance().player) != null &&
+                            HorseCombatControls.isInCombatMode(player) &&
+                            player.isPassenger()
+                    ) {
+                        return;
+                    }
+                    calculateMoveImpulse.accept(e);
+                });
+            }
+            catch (ClassNotFoundException ignore) {}
+            catch (NoSuchFieldException | IllegalAccessException e) {
+                HorseCombatControls.LOGGER.warn(e);
+            }
+        }
+
         private static void onClientSetup(final RegisterKeyMappingsEvent event) {
             toggleControls = new KeyMapping("key.horsecombatcontrols.toggle", 89, "key.horsecombatcontrols.category");
             event.register(toggleControls);

@@ -61,3 +61,10 @@ license="${mod_license}"
     versionRange="${minecraft_version_range}"
     ordering="NONE"
     side="BOTH"
+[[dependencies.${mod_id}]]
+    modId="leawind_third_person"
+    mandatory=false
+    # This version range declares a minimum of the current minecraft version up to but not including the next major version
+    versionRange="${leawind_version_range}"
+    ordering="AFTER"
+    side="CLIENT"
